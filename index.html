@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>미사일 피하기 게임</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="score-board">점수: <span id="score">0</span></div>
+        <!-- 게임이 그려질 도화지 (크기: 400x600) -->
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        
+        <!-- 게임 오버 화면 -->
+        <div id="game-over" class="hidden">
+            <h2>게임 오버!</h2>
+            <p>최종 점수: <span id="final-score">0</span>점</p>
+            <button id="restart-btn">다시 하기</button>
+        </div>
+    </div>
+
+    <!-- 순서대로 스크립트를 불러옵니다 -->
+    <script src="js/player.js"></script>
+    <script src="js/missile.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
