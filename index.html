@@ -2,15 +2,21 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>미사일 피하기 게임</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div id="game-container">
         <div id="score-board">점수: <span id="score">0</span></div>
-        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <canvas id="gameCanvas"></canvas>
         
+        <!-- 하단 조작 버튼 영역 -->
+        <div id="controls">
+            <button id="btn-left" class="control-btn">◀ 왼쪽</button>
+            <button id="btn-right" class="control-btn">오른쪽 ▶</button>
+        </div>
+
         <div id="game-over" class="hidden">
             <h2>게임 오버!</h2>
             <p>최종 점수: <span id="final-score">0</span>점</p>
@@ -20,7 +26,7 @@
 
     <script src="js/player.js"></script>
     <script src="js/missile.js"></script>
-    <script src="js/asteroid.js"></script> <!-- 운석 스크립트 추가됨 -->
+    <script src="js/asteroid.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
