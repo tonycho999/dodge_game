@@ -5,7 +5,6 @@ const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
 const restartBtn = document.getElementById('restart-btn');
 
-// 하단 조작 버튼 요소 가져오기
 const btnLeft = document.getElementById('btn-left');
 const btnRight = document.getElementById('btn-right');
 
@@ -18,13 +17,15 @@ let isGameOver = false;
 let scoreInterval;
 let frameCount = 0;
 
+// ★ 이동 상태를 저장하는 변수 추가 (버그 방지용)
+let isMovingLeft = false;
+let isMovingRight = false;
+
 function resizeCanvas() {
     canvas.width = window.innerWidth;
-    // 전체 높이에서 하단 컨트롤 영역(약 90px: 패딩 포함) 제외한 높이
     canvas.height = window.innerHeight - 90; 
     
     if (player) {
-        // 비행기를 캔버스 맨 아래쪽으로 명확하게 위치시킴
         player.y = canvas.height - player.height - 10; 
         if(player.x > canvas.width) player.x = canvas.width - player.width;
     }
@@ -66,9 +67,11 @@ function init() {
     resizeCanvas(); 
     
     player = new Player(canvas.width, canvas.height);
-    // 비행기 위치 다시 한 번 강제 교정 (화면 잘림 방지)
     player.y = canvas.height - player.height - 10;
-    player.speed = window.innerWidth > 600 ? 8 : 6; 
+    
+    // 상태 초기화
+    isMovingLeft = false;
+    isMovingRight = false;
     
     obstacles = [];
     score = 0;
@@ -96,6 +99,15 @@ function update() {
     frameCount++;
 
     drawBackground();
+
+    // ★ 이동 상태에 따라 플레이어 속도 적용 (여기서만 속도가 결정됨)
+    if (isMovingLeft) {
+        player.dx = -player.speed;
+    } else if (isMovingRight) {
+        player.dx = player.speed;
+    } else {
+        player.dx = 0;
+    }
 
     let speedMultiplier = 1 + (score * 0.03); 
     let spawnRate = Math.max(10, 24 - Math.floor(score * 0.3));
@@ -143,7 +155,9 @@ function gameOver() {
     isGameOver = true;
     clearInterval(scoreInterval);
     cancelAnimationFrame(gameLoopId);
-    // 이동 정지
+    
+    isMovingLeft = false;
+    isMovingRight = false;
     player.dx = 0; 
     
     finalScoreElement.innerText = score;
@@ -151,50 +165,54 @@ function gameOver() {
 }
 
 // --------------------------------------------------
-// 키보드 조작 (PC)
+// 입력 처리 (상태값만 변경)
 // --------------------------------------------------
+
+// 키보드 조작
 document.addEventListener('keydown', (e) => {
-    if (e.code === 'ArrowLeft') player.dx = -player.speed;
-    if (e.code === 'ArrowRight') player.dx = player.speed;
+    if (e.code === 'ArrowLeft') isMovingLeft = true;
+    if (e.code === 'ArrowRight') isMovingRight = true;
 });
 
 document.addEventListener('keyup', (e) => {
-    if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') player.dx = 0;
+    if (e.code === 'ArrowLeft') isMovingLeft = false;
+    if (e.code === 'ArrowRight') isMovingRight = false;
 });
 
-// --------------------------------------------------
-// ★ 버튼 터치/클릭 이벤트 (모바일/PC 공통)
-// --------------------------------------------------
-function moveLeft(e) {
-    e.preventDefault(); // 스크롤 등 기본 동작 방지
-    player.dx = -player.speed;
-}
-
-function moveRight(e) {
+// 터치/클릭 버튼 조작 (버튼 누를 때 게임 프레임이 빨라지는 버그 해결)
+function handleLeftStart(e) {
     e.preventDefault();
-    player.dx = player.speed;
+    isMovingLeft = true;
 }
-
-function stopMove(e) {
+function handleLeftEnd(e) {
     e.preventDefault();
-    player.dx = 0;
+    isMovingLeft = false;
 }
 
-// 왼쪽 버튼 이벤트
-btnLeft.addEventListener('touchstart', moveLeft, {passive: false});
-btnLeft.addEventListener('mousedown', moveLeft);
+function handleRightStart(e) {
+    e.preventDefault();
+    isMovingRight = true;
+}
+function handleRightEnd(e) {
+    e.preventDefault();
+    isMovingRight = false;
+}
 
-btnLeft.addEventListener('touchend', stopMove, {passive: false});
-btnLeft.addEventListener('mouseup', stopMove);
-btnLeft.addEventListener('mouseleave', stopMove);
+// 왼쪽 버튼
+btnLeft.addEventListener('touchstart', handleLeftStart, {passive: false});
+btnLeft.addEventListener('mousedown', handleLeftStart);
 
-// 오른쪽 버튼 이벤트
-btnRight.addEventListener('touchstart', moveRight, {passive: false});
-btnRight.addEventListener('mousedown', moveRight);
+btnLeft.addEventListener('touchend', handleLeftEnd, {passive: false});
+btnLeft.addEventListener('mouseup', handleLeftEnd);
+btnLeft.addEventListener('mouseleave', handleLeftEnd);
 
-btnRight.addEventListener('touchend', stopMove, {passive: false});
-btnRight.addEventListener('mouseup', stopMove);
-btnRight.addEventListener('mouseleave', stopMove);
+// 오른쪽 버튼
+btnRight.addEventListener('touchstart', handleRightStart, {passive: false});
+btnRight.addEventListener('mousedown', handleRightStart);
+
+btnRight.addEventListener('touchend', handleRightEnd, {passive: false});
+btnRight.addEventListener('mouseup', handleRightEnd);
+btnRight.addEventListener('mouseleave', handleRightEnd);
 
 
 restartBtn.addEventListener('click', init);
