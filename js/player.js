@@ -5,7 +5,7 @@ class Player {
         // 정중앙 하단에 위치
         this.x = canvasWidth / 2 - this.width / 2;
         this.y = canvasHeight - this.height - 20;
-        this.speed = 6;
+        this.speed = 3;
         this.dx = 0; // x축 이동 방향 및 속도
         
         // 이미지 로드 시도
